@@ -1,15 +1,18 @@
 package com.example.webflux_demo.post.entity;
 
+
+
+
 import com.example.webflux_demo.comment.entity.Comment;
-import com.example.webflux_demo.member.Member;
-import jakarta.annotation.Generated;
+import com.example.webflux_demo.member.dto.MemberInfo;
 import lombok.*;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.sql.Date;
+
 import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Getter
 @NoArgsConstructor
@@ -35,7 +38,7 @@ public class MatPost {
     private Long memberId;
 
     @Transient
-    private Member member;
+    private MemberInfo member;
 
     @Transient
     private List<Comment> comments;

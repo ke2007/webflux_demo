@@ -8,6 +8,7 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
 public interface MatPostRepository extends ReactiveCrudRepository<MatPost, Long> {
 
     @Query("""
@@ -17,11 +18,21 @@ public interface MatPostRepository extends ReactiveCrudRepository<MatPost, Long>
 
 
     @Query("""
-            SELECT * FROM mat_post p WHERE p.member_id
-""")
-    Mono<MatPost> findMatPostWithMember(Long memberId);
-
-    @Query("SELECT p.id,p.title, p.content, p.likes, p.thumbnail_url, p.star, p.created_at, p.modified_at, m.nickname, m.profile_img FROM mat_post p INNER JOIN member m ON p.member_id = m.id where p.id = :postId ")
+            SELECT
+            p.id,
+            p.title,
+            p.content,
+            p.likes,
+            p.thumbnail_url,
+            p.star,
+            p.created_at,
+            p.modified_at,
+            m.nickname,
+            m.profile_img FROM mat_post p
+            INNER JOIN member m
+            ON p.member_id = m.id
+            where p.id = :postId
+            """)
     Mono<PostUserSpecificInfo> findPostWithMemberInfo(Long postId);
 
 }

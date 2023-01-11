@@ -1,27 +1,31 @@
 package com.example.webflux_demo.post.service;
 
-import com.example.webflux_demo.member.dto.PostUserSpecificInfo;
+import com.example.webflux_demo.comment.dto.CommentInfo;
+import com.example.webflux_demo.comment.repository.CommentRepository;
+import com.example.webflux_demo.comment.service.CommentService;
+import com.example.webflux_demo.member.MemberRepository;
+import com.example.webflux_demo.member.dto.MemberInfo;
 import com.example.webflux_demo.post.entity.MatPost;
 import com.example.webflux_demo.post.entity.dto.MatPostResponse;
+import com.example.webflux_demo.post.entity.dto.PostResponseWithMember;
 import com.example.webflux_demo.post.entity.dto.SaveMatPostRequest;
 import com.example.webflux_demo.post.entity.dto.UpdateMatPostRequest;
-import com.example.webflux_demo.post.repository.CustomRepository;
 import com.example.webflux_demo.post.repository.MatPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
 public class MatPostService {
 
-    private final MatPostRepository matPostRepository;
-    private final CustomRepository customRepository;
+    private final CommentService commentService;
 
-    public Flux<MatPostResponse> getAll(){
+    private final MatPostRepository matPostRepository;
+
+    public Flux<MatPostResponse> getAll() {
 
         Flux<MatPostResponse> responseFlux = matPostRepository.findAll()
                 .map(MatPostResponse::from);
@@ -75,8 +79,32 @@ public class MatPostService {
         return mono;
     }
 
-    public Mono<PostUserSpecificInfo> getPost(Long postId) {
+    public Mono<PostResponseWithMember> getPost(Long postId) {
+        return matPostRepository.findPostWithMemberInfo(postId)
+                .publishOn(Schedulers.boundedElastic())
+                .map(result -> {
 
-        return matPostRepository.findPostWithMemberInfo(postId);
+            var member = MemberInfo.builder()
+                    .nickname(result.nickname())
+                    .profileImg(result.profileImg())
+                    .build();
+
+            var comments = commentService.getComments(postId).block();
+
+            return PostResponseWithMember.builder()
+                    .id(result.id())
+                    .title(result.title())
+                    .content(result.content())
+                    .likes(result.likes())
+                    .thumbnailUrl(result.thumbnailUrl())
+                    .star(result.star())
+                    .createdAt(result.createdAt())
+                    .modifiedAt(result.modifiedAt())
+                    .memberInfo(member)
+                    .comments(comments)
+                    .build();
+        });
+
     }
+
 }

@@ -14,25 +14,27 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "Comment")
+@Table(name = "post_comment")
 @Setter
 public class Comment {
 
     @Id
     private Long id;
 
-    private String content;
+    private String comment_content;
 
-    private Long memberId;
+    private Long userId;
+
+    private Long feedId;
 
     @Transient
     private Member member;
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    private LocalDateTime comment_createdAt;
 
     @LastModifiedDate
-    private LocalDateTime modifiedAt;
+    private LocalDateTime comment_modifiedAt;
 
 
 }

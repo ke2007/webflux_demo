@@ -28,6 +28,8 @@ public class Member {
 
     private String nickname;
 
+    private String profileImg;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

@@ -4,6 +4,7 @@ package com.example.webflux_demo.post.controller;
 import com.example.webflux_demo.exception.PostNotFoundException;
 import com.example.webflux_demo.member.dto.PostUserSpecificInfo;
 import com.example.webflux_demo.post.entity.dto.MatPostResponse;
+import com.example.webflux_demo.post.entity.dto.PostResponseWithMember;
 import com.example.webflux_demo.post.entity.dto.SaveMatPostRequest;
 import com.example.webflux_demo.post.entity.dto.UpdateMatPostRequest;
 import com.example.webflux_demo.post.service.MatPostService;
@@ -90,12 +91,12 @@ public class MatPostController {
 
 
     @GetMapping("/specific/{post-id}")
-    public Mono<ResponseEntity<PostUserSpecificInfo>> getSpecific(@PathVariable("post-id") Long postId) {
+    public Mono<ResponseEntity<PostResponseWithMember>> getSpecific(@PathVariable("post-id") Long postId) {
 
-        Mono<ResponseEntity<PostUserSpecificInfo>> responseEntityMono = matPostService.getPost( postId)
+        Mono<ResponseEntity<PostResponseWithMember>> map = matPostService.getPost(postId)
                 .map(ResponseEntity::ok);
 
-        return responseEntityMono;
+        return map;
     }
 
 }
