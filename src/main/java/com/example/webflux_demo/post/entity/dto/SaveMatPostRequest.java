@@ -1,17 +1,21 @@
 package com.example.webflux_demo.post.entity.dto;
 
 import com.example.webflux_demo.post.entity.MatPost;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
-public record SaveMatPostRequest(Long postId,String title, String content, Long star, String thumbnailUrl) {
+
+public record SaveMatPostRequest(@NotBlank(message = "제목은 공백일 수 없습니다 !") String title,@NotBlank(message = "내용은 공백일 수 없습니다 !")String content,
+                                 int likes, String thumbnailUrl, int star) {
 
 
     public MatPost toEntity() {
         return MatPost.builder()
-                .id(postId)
                 .title(title)
                 .content(content)
-                .star(star)
+                .likes(likes)
                 .thumbnailUrl(thumbnailUrl)
+                .star(star)
                 .build();
     }
 }

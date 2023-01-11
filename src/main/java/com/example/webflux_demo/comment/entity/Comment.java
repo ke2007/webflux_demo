@@ -1,10 +1,7 @@
-package com.example.webflux_demo.member;
+package com.example.webflux_demo.comment.entity;
 
-import com.example.webflux_demo.post.entity.MatPost;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.example.webflux_demo.member.Member;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -12,21 +9,24 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "member")
-public class Member {
+@Table(name = "Comment")
+@Setter
+public class Comment {
 
     @Id
     private Long id;
 
     private String content;
 
-    private String nickname;
+    private Long memberId;
+
+    @Transient
+    private Member member;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -34,10 +34,5 @@ public class Member {
     @LastModifiedDate
     private LocalDateTime modifiedAt;
 
-    @Transient
-    private List<MatPost> posts;
 
-    public Member(String nickname) {
-        this.nickname = nickname;
-    }
 }

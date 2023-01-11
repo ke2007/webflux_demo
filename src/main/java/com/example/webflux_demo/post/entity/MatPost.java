@@ -1,24 +1,22 @@
 package com.example.webflux_demo.post.entity;
 
+import com.example.webflux_demo.comment.entity.Comment;
+import com.example.webflux_demo.member.Member;
 import jakarta.annotation.Generated;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
+import lombok.*;
+import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "mat_post")
+@Setter
 public class MatPost {
 
     @Id
@@ -32,7 +30,15 @@ public class MatPost {
 
     private String thumbnailUrl;
 
-    private long star;
+    private int star;
+
+    private Long memberId;
+
+    @Transient
+    private Member member;
+
+    @Transient
+    private List<Comment> comments;
 
     @CreatedDate
     private LocalDateTime createdAt;
