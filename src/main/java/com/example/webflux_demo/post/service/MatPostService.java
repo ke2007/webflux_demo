@@ -2,10 +2,7 @@ package com.example.webflux_demo.post.service;
 
 import com.example.webflux_demo.comment.dto.CommentInfo;
 import com.example.webflux_demo.comment.dto.MultiResponseDto;
-import com.example.webflux_demo.comment.repository.CommentRepository;
 import com.example.webflux_demo.comment.service.CommentService;
-import com.example.webflux_demo.member.Member;
-import com.example.webflux_demo.member.MemberRepository;
 import com.example.webflux_demo.member.dto.MemberInfo;
 import com.example.webflux_demo.post.entity.MatPost;
 import com.example.webflux_demo.post.entity.dto.MatPostResponse;
@@ -31,11 +28,13 @@ public class MatPostService {
 
     private final MatPostRepository matPostRepository;
 
-    public Flux<MatPostResponse> getAll() {
+    public Flux<MatPostResponse> getAll(int page,int size) {
 
-        Flux<MatPostResponse> responseFlux = matPostRepository.findAll()
+        Flux<MatPostResponse> map = matPostRepository.findAll()
+                .skip(page * size)
+                .take(size)
                 .map(MatPostResponse::from);
-        return responseFlux;
+        return map;
     }
 
     public Mono<MatPostResponse> getOne(Long matPostId) {

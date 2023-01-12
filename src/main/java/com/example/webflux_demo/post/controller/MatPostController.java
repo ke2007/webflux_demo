@@ -5,6 +5,7 @@ import com.example.webflux_demo.comment.dto.MultiResponseDto;
 import com.example.webflux_demo.exception.CustomErrorCode;
 import com.example.webflux_demo.exception.PostNotFoundException;
 import com.example.webflux_demo.member.dto.PostUserSpecificInfo;
+import com.example.webflux_demo.post.entity.MatPost;
 import com.example.webflux_demo.post.entity.dto.MatPostResponse;
 import com.example.webflux_demo.post.entity.dto.PostResponseWithMember;
 import com.example.webflux_demo.post.entity.dto.SaveMatPostRequest;
@@ -29,13 +30,10 @@ public class MatPostController {
     private final MatPostService matPostService;
 
     @GetMapping
-    public Mono<ResponseEntity<List<MatPostResponse>>> getAllMatPosts() {
+    public Flux<MatPostResponse> getAllMatPosts(@RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "3") int size) {
 
-        Mono<ResponseEntity<List<MatPostResponse>>> responseEntityMono =
-                matPostService.getAll().collectList()
-                .map(ResponseEntity::ok);
-
-        return responseEntityMono;
+        return matPostService.getAll(page, size);
     }
 
     @GetMapping("/{post-id}")
@@ -43,8 +41,8 @@ public class MatPostController {
 
         Mono<ResponseEntity<MatPostResponse>> responseEntityMono =
                 matPostService.getOne(matPostId)
-                .map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));
+                        .map(ResponseEntity::ok)
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND))));
 
         return responseEntityMono;
     }
@@ -52,20 +50,21 @@ public class MatPostController {
     @GetMapping("/search")
     public Flux<MatPostResponse> getSearchMatPost(@RequestParam("keyword") String keyword) {
 
-        Flux<MatPostResponse> responseEntityFlux = matPostService.findPostByKeyword(keyword).switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));;
+        Flux<MatPostResponse> responseEntityFlux = matPostService.findPostByKeyword(keyword).switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));
+        ;
 
         return responseEntityFlux;
     }
 
     @PostMapping
-    public Mono<ResponseEntity<MatPostResponse>> saveMatPost( @RequestBody @Validated Mono<SaveMatPostRequest> request) {
+    public Mono<ResponseEntity<MatPostResponse>> saveMatPost(@RequestBody @Validated Mono<SaveMatPostRequest> request) {
 
         Mono<ResponseEntity<MatPostResponse>> responseEntityMono = request
                 .flatMap(matPostService::save)
                 .map(mp -> new ResponseEntity<>(mp, HttpStatus.CREATED));
 
         return responseEntityMono;
-     }
+    }
 
 
     @PatchMapping("/{post-id}")
@@ -74,7 +73,7 @@ public class MatPostController {
         Mono<ResponseEntity<MatPostResponse>> responseEntityMono = request
                 .flatMap((UpdateMatPostRequest updateMatPostRequest) -> matPostService.update(updateMatPostRequest, postId))
                 .map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND))));
 
         return responseEntityMono;
     }
@@ -85,7 +84,7 @@ public class MatPostController {
 
         Mono<ResponseEntity<Void>> responseEntityMono = matPostService.delete(postId)
                 .map(response -> ResponseEntity.noContent().<Void>build())
-                .switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND))));
 
         return responseEntityMono;
     }
@@ -96,9 +95,8 @@ public class MatPostController {
 
         Mono<ResponseEntity<MultiResponseDto>> map = matPostService.getPost(postId)
                 .map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND))));
 
         return map;
     }
-
 }
