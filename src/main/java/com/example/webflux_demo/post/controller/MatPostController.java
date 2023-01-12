@@ -1,6 +1,8 @@
 package com.example.webflux_demo.post.controller;
 
 
+import com.example.webflux_demo.comment.dto.MultiResponseDto;
+import com.example.webflux_demo.exception.CustomErrorCode;
 import com.example.webflux_demo.exception.PostNotFoundException;
 import com.example.webflux_demo.member.dto.PostUserSpecificInfo;
 import com.example.webflux_demo.post.entity.dto.MatPostResponse;
@@ -42,7 +44,7 @@ public class MatPostController {
         Mono<ResponseEntity<MatPostResponse>> responseEntityMono =
                 matPostService.getOne(matPostId)
                 .map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(new PostNotFoundException(matPostId)));
+                .switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));
 
         return responseEntityMono;
     }
@@ -50,7 +52,7 @@ public class MatPostController {
     @GetMapping("/search")
     public Flux<MatPostResponse> getSearchMatPost(@RequestParam("keyword") String keyword) {
 
-        Flux<MatPostResponse> responseEntityFlux = matPostService.findPostByKeyword(keyword);
+        Flux<MatPostResponse> responseEntityFlux = matPostService.findPostByKeyword(keyword).switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));;
 
         return responseEntityFlux;
     }
@@ -72,7 +74,7 @@ public class MatPostController {
         Mono<ResponseEntity<MatPostResponse>> responseEntityMono = request
                 .flatMap((UpdateMatPostRequest updateMatPostRequest) -> matPostService.update(updateMatPostRequest, postId))
                 .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.badRequest().build());
+                .switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));
 
         return responseEntityMono;
     }
@@ -82,19 +84,19 @@ public class MatPostController {
     public Mono<ResponseEntity<Void>> deleteMatPost(@PathVariable("post-id") Long postId) {
 
         Mono<ResponseEntity<Void>> responseEntityMono = matPostService.delete(postId)
-                .map(response -> ResponseEntity.ok().<Void>build())
-                .defaultIfEmpty(ResponseEntity.noContent().build());
-
+                .map(response -> ResponseEntity.noContent().<Void>build())
+                .switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));
 
         return responseEntityMono;
     }
 
 
     @GetMapping("/specific/{post-id}")
-    public Mono<ResponseEntity<PostResponseWithMember>> getSpecific(@PathVariable("post-id") Long postId) {
+    public Mono<ResponseEntity<MultiResponseDto>> getSpecific(@PathVariable("post-id") Long postId) {
 
-        Mono<ResponseEntity<PostResponseWithMember>> map = matPostService.getPost(postId)
-                .map(ResponseEntity::ok);
+        Mono<ResponseEntity<MultiResponseDto>> map = matPostService.getPost(postId)
+                .map(ResponseEntity::ok)
+                .switchIfEmpty(Mono.error(new PostNotFoundException(CustomErrorCode.POST_NOT_FOUND)));
 
         return map;
     }

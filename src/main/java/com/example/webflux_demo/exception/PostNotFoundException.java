@@ -1,8 +1,14 @@
 package com.example.webflux_demo.exception;
 
 
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+@Getter
 public class PostNotFoundException extends RuntimeException {
-    public PostNotFoundException(Long id) {
-        super("게시물 번호 : " + id +" 번 게시물을 찾을 수가 없습니다 !! ");
+
+    private CustomErrorCode customErrorCode;
+
+    public PostNotFoundException(CustomErrorCode customErrorCode) {
+        this.customErrorCode = customErrorCode;
     }
 }

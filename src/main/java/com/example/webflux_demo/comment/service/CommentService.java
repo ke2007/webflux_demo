@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -18,20 +19,23 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+
     public Mono<List<CommentInfo>> getComments(Long postId) {
-        Mono<List<CommentInfo>> listMono = commentRepository.findPost_CommentWithMember(postId).map(commentSpecificInfo -> {
+        Mono<List<CommentInfo>> listMono = commentRepository.findPost_CommentWithMember(postId)
+                .map(commentSpecificInfo -> {
 
-            var memberInfo = MemberInfo.builder()
-                    .nickname(commentSpecificInfo.nickname())
-                    .profileImg(commentSpecificInfo.profileImg())
-                    .build();
+                    var memberInfo = MemberInfo.builder()
+                            .nickname(commentSpecificInfo.nickname())
+                            .profileImg(commentSpecificInfo.profileImg())
+                            .build();
 
-            return CommentInfo.builder()
-                    .commentContent(commentSpecificInfo.commentContent())
-                    .commentCreatedAt(commentSpecificInfo.commentCreatedAt())
-                    .memberInfo(memberInfo)
-                    .build();
-        }).collectList();
+                    return CommentInfo.builder()
+                            .CommentId(commentSpecificInfo.id())
+                            .commentContent(commentSpecificInfo.commentContent())
+                            .commentCreatedAt(commentSpecificInfo.commentCreatedAt())
+                            .memberInfo(memberInfo)
+                            .build();
+                }).collectList();
 
         return listMono;
     }
@@ -46,5 +50,20 @@ public class CommentService {
         return map;
     }
 
+    public Mono<CommentResponse> updateComment(SaveCommentRequest saveCommentRequest, Long postId, Long commentId) {
+        Comment patchComment = saveCommentRequest.toEntity();
+
+        return commentRepository.findById(commentId).flatMap(comment -> {
+            comment.setId(commentId);
+            comment.setFeedId(postId);
+            comment.setComment_content(patchComment.getComment_content());
+            return commentRepository.save(comment);
+        }).map(CommentResponse::from);
+
+    }
+
+    public Mono<Void> deleteComment(Long commentId) {
+        return commentRepository.deleteById(commentId);
+    }
 
 }
