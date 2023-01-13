@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Service
@@ -45,7 +45,7 @@ public class CommentService {
         Comment postComment = saveCommentRequest.toEntity();
         //TODO 멤버 완성되면 멤버ID 토큰에서 뺴오는작업 해야함.
         postComment.setUserId(1L);
-        postComment.setFeedId(postId);
+        postComment.setPostId(postId);
         Mono<Comment> save = commentRepository.save(postComment);
         Mono<CommentResponse> map = save.map(CommentResponse::from);
         return map;
@@ -56,7 +56,7 @@ public class CommentService {
 
         return commentRepository.findById(commentId).flatMap(comment -> {
             comment.setId(commentId);
-            comment.setFeedId(postId);
+            comment.setPostId(postId);
             comment.setComment_content(patchComment.getComment_content());
             return commentRepository.save(comment);
         }).map(CommentResponse::from);
