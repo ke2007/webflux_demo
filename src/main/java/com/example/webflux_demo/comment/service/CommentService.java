@@ -43,7 +43,8 @@ public class CommentService {
     public Mono<CommentResponse> save(SaveCommentRequest saveCommentRequest, Long postId) {
 
         Comment postComment = saveCommentRequest.toEntity();
-        postComment.setUserId(3L);
+        //TODO 멤버 완성되면 멤버ID 토큰에서 뺴오는작업 해야함.
+        postComment.setUserId(1L);
         postComment.setFeedId(postId);
         Mono<Comment> save = commentRepository.save(postComment);
         Mono<CommentResponse> map = save.map(CommentResponse::from);
@@ -61,7 +62,6 @@ public class CommentService {
         }).map(CommentResponse::from);
 
     }
-
     public Mono<Void> deleteComment(Long commentId) {
         return commentRepository.deleteById(commentId);
     }

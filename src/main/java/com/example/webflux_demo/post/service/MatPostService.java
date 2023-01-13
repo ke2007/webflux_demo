@@ -54,6 +54,7 @@ public class MatPostService {
     public Mono<MatPostResponse> save(SaveMatPostRequest request) {
 
         MatPost matPost = request.toEntity();
+        //TODO 멤버 완성되면 멤버ID 토큰에서 뺴오는작업 해야함.
         matPost.setMemberId(2L);
 
         Mono<MatPost> save = matPostRepository.save(matPost);

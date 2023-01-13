@@ -2,7 +2,6 @@ package com.example.webflux_demo.comment.dto;
 
 import com.example.webflux_demo.post.entity.dto.PostResponseWithMember;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
 
 import java.util.List;
 
