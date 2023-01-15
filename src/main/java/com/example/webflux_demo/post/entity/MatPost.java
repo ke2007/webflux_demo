@@ -19,7 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "mat_post")
-@Setter
 public class MatPost {
 
     @Id
@@ -48,5 +47,16 @@ public class MatPost {
 
     @LastModifiedDate
     private LocalDateTime modifiedAt;
+
+    public void settingLikes(int count) {
+        this.likes = count;
+    }
+    public MatPost settingPost(MatPost post) {
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.thumbnailUrl = post.getThumbnailUrl();
+        this.star = post.getStar();
+        return post;
+    }
 
 }

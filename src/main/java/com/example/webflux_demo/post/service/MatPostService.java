@@ -55,7 +55,7 @@ public class MatPostService {
 
         MatPost matPost = request.toEntity();
         //TODO 멤버 완성되면 멤버ID 토큰에서 뺴오는작업 해야함.
-        matPost.setMemberId(2L);
+//        matPost.setMemberId(2L);
 
         Mono<MatPost> save = matPostRepository.save(matPost);
         Mono<MatPostResponse> map = save.map(MatPostResponse::from);
@@ -66,13 +66,9 @@ public class MatPostService {
     public Mono<MatPostResponse> update(UpdateMatPostRequest updateMatPostRequest, Long postId) {
         MatPost matPost = updateMatPostRequest.toEntity();
 
-        Mono<MatPostResponse> map = matPostRepository.findById(postId).flatMap(post -> {
-            post.setTitle(matPost.getTitle());
-            post.setContent(matPost.getContent());
-            post.setThumbnailUrl(matPost.getThumbnailUrl());
-            post.setStar(matPost.getStar());
-            return matPostRepository.save(post);
-        }).map(MatPostResponse::from);
+        Mono<MatPostResponse> map = matPostRepository.findById(postId)
+                .flatMap(post -> matPostRepository.save(post.settingPost(matPost)))
+                .map(MatPostResponse::from);
 
         return map;
     }
