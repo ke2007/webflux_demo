@@ -3,6 +3,7 @@ package com.example.webflux_demo.post.repository;
 
 import com.example.webflux_demo.member.dto.PostUserSpecificInfo;
 import com.example.webflux_demo.post.entity.MatPost;
+import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
@@ -17,6 +18,7 @@ public interface MatPostRepository extends ReactiveCrudRepository<MatPost, Long>
     Flux<MatPost> searchMatPostByKeyword(String keyword);
 
     //TODO 쿼리 수정
+    @Modifying
     @Query("""
             SELECT
             p.id,

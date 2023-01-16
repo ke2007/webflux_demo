@@ -19,7 +19,6 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
-@Transactional
 @Service
 @RequiredArgsConstructor
 public class MatPostService {
@@ -27,7 +26,7 @@ public class MatPostService {
     private final CommentService commentService;
 
     private final MatPostRepository matPostRepository;
-
+    @Transactional(readOnly = true)
     public Flux<MatPostResponse> getAll(int page,int size) {
 
         Flux<MatPostResponse> map = matPostRepository.findAll()
@@ -36,21 +35,21 @@ public class MatPostService {
                 .map(MatPostResponse::from);
         return map;
     }
-
+    @Transactional(readOnly = true)
     public Mono<MatPostResponse> getOne(Long matPostId) {
 
         Mono<MatPostResponse> responseFlux = matPostRepository.findById(matPostId)
                 .map(MatPostResponse::from);
         return responseFlux;
     }
-
+    @Transactional(readOnly = true)
     public Flux<MatPostResponse> findPostByKeyword(String keyword) {
 
         Flux<MatPostResponse> listMono = matPostRepository.searchMatPostByKeyword(keyword)
                 .map(MatPostResponse::from);
         return listMono;
     }
-
+    @Transactional
     public Mono<MatPostResponse> save(SaveMatPostRequest request) {
 
         MatPost matPost = request.toEntity();
@@ -62,7 +61,7 @@ public class MatPostService {
 
         return map;
     }
-
+    @Transactional
     public Mono<MatPostResponse> update(UpdateMatPostRequest updateMatPostRequest, Long postId) {
         MatPost matPost = updateMatPostRequest.toEntity();
 
@@ -73,6 +72,7 @@ public class MatPostService {
         return map;
     }
 
+    @Transactional
     public Mono<Void> delete(Long postId) {
 
         Mono<Void> mono = matPostRepository.findById(postId)
@@ -104,10 +104,17 @@ public class MatPostService {
                             .modifiedAt(result.modifiedAt())
                             .memberInfo(member)
                             .build();
+                    matPostRepository.findById(postId)
+                            .map(findPost -> {
+                                findPost.settingLikes(result.likes());
+                                return findPost;
+                            })
+                            .flatMap(matPostRepository::save).subscribe();
                     MultiResponseDto multiResponseDto = new MultiResponseDto(build, comments);
                     return multiResponseDto;
                 });
-    return map;
+
+        return map;
     }
 
 }

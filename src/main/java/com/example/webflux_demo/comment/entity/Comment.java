@@ -15,13 +15,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Table(name = "post_comment")
-@Setter
 public class Comment {
 
     @Id
     private Long id;
 
-    private String comment_content;
+    private String commentContent;
 
     private Long userId;
 
@@ -31,10 +30,18 @@ public class Comment {
     private Member member;
 
     @CreatedDate
-    private LocalDateTime comment_createdAt;
+    private LocalDateTime commentCreatedAt;
 
     @LastModifiedDate
-    private LocalDateTime comment_modifiedAt;
+    private LocalDateTime commentModifiedAt;
 
+    public void updatePostId(Long postId) {
+        this.postId = postId;
+    }
 
+    public void patchComment(Long id, Long postId, String commentContent) {
+        this.id = id;
+        this.postId = postId;
+        this.commentContent = commentContent;
+    }
 }

@@ -9,6 +9,7 @@ import com.example.webflux_demo.comment.repository.CommentRepository;
 import com.example.webflux_demo.member.dto.MemberInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 
@@ -20,6 +21,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
+    @Transactional(readOnly = true)
     public Mono<List<CommentInfo>> getComments(Long postId) {
         Mono<List<CommentInfo>> listMono = commentRepository.findPost_CommentWithMember(postId)
                 .map(commentSpecificInfo -> {
@@ -40,28 +42,29 @@ public class CommentService {
         return listMono;
     }
 
+    @Transactional
     public Mono<CommentResponse> save(SaveCommentRequest saveCommentRequest, Long postId) {
 
         Comment postComment = saveCommentRequest.toEntity();
         //TODO 멤버 완성되면 멤버ID 토큰에서 뺴오는작업 해야함.
-        postComment.setUserId(1L);
-        postComment.setPostId(postId);
+//        postComment.setUserId(1L);
+        postComment.updatePostId(postId);
         Mono<Comment> save = commentRepository.save(postComment);
         Mono<CommentResponse> map = save.map(CommentResponse::from);
         return map;
     }
 
+    @Transactional
     public Mono<CommentResponse> updateComment(SaveCommentRequest saveCommentRequest, Long postId, Long commentId) {
-        Comment patchComment = saveCommentRequest.toEntity();
+        Comment requestComment = saveCommentRequest.toEntity();
 
         return commentRepository.findById(commentId).flatMap(comment -> {
-            comment.setId(commentId);
-            comment.setPostId(postId);
-            comment.setComment_content(patchComment.getComment_content());
+            comment.patchComment(commentId,postId, requestComment.getCommentContent());
             return commentRepository.save(comment);
         }).map(CommentResponse::from);
 
     }
+    @Transactional
     public Mono<Void> deleteComment(Long commentId) {
         return commentRepository.deleteById(commentId);
     }

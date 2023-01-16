@@ -10,7 +10,7 @@ public record SaveCommentRequest(@NotBlank(message = " 댓글내용은 비어있
 
     public Comment toEntity() {
         return Comment.builder()
-                .comment_content(content)
+                .commentContent(content)
                 .build();
     }
 }
