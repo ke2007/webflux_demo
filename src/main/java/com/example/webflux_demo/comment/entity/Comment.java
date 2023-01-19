@@ -44,4 +44,8 @@ public class Comment {
         this.postId = postId;
         this.commentContent = commentContent;
     }
+
+    public void settingUserId(Long memberId) {
+        this.userId = memberId;
+    }
 }

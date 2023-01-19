@@ -23,7 +23,7 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public Mono<List<CommentInfo>> getComments(Long postId) {
-        Mono<List<CommentInfo>> listMono = commentRepository.findPost_CommentWithMember(postId)
+        Mono<List<CommentInfo>> listMono = commentRepository.findPostCommentWithMember(postId)
                 .map(commentSpecificInfo -> {
 
                     var memberInfo = MemberInfo.builder()
@@ -47,7 +47,8 @@ public class CommentService {
 
         Comment postComment = saveCommentRequest.toEntity();
         //TODO 멤버 완성되면 멤버ID 토큰에서 뺴오는작업 해야함.
-//        postComment.setUserId(1L);
+        //post를 찾고 comments 에 넣어서 만들어야함
+        postComment.settingUserId(1L);
         postComment.updatePostId(postId);
         Mono<Comment> save = commentRepository.save(postComment);
         Mono<CommentResponse> map = save.map(CommentResponse::from);
