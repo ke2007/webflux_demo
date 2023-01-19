@@ -1,8 +1,6 @@
 package com.example.webflux_demo.post.entity;
 
 
-
-
 import com.example.webflux_demo.comment.entity.Comment;
 import com.example.webflux_demo.member.dto.MemberInfo;
 import lombok.*;
@@ -48,15 +46,16 @@ public class MatPost {
     @LastModifiedDate
     private LocalDateTime modifiedAt;
 
-    public void settingLikes(int count) {
-        this.likes = count;
-    }
-    public MatPost settingPost(MatPost post) {
-        this.title = post.getTitle();
-        this.content = post.getContent();
-        this.thumbnailUrl = post.getThumbnailUrl();
-        this.star = post.getStar();
+
+    public MatPost settingPost(MatPost post, MatPost post1) {
+        this.id = post.getId();
+        this.title = post1.getTitle();
+        this.content = post1.getContent();
+        this.thumbnailUrl = post1.getThumbnailUrl();
+        this.star = post1.getStar();
         return post;
     }
-
+    public void setMemberId(Long memberId) {
+        this.memberId = memberId;
+    }
 }

@@ -18,8 +18,6 @@ public class Likes {
 
     private Long postId;
 
-    private Long placeId;
-
     private Long userId;
 
     private int likesCheck;

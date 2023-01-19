@@ -20,13 +20,13 @@ public class LikeController {
                                    @PathVariable("post-id") Long postId) {
         //TODO member 구현시 member 정보 들어가야함
         //TODO likes post 에서 불리언처리
-        Long memberId = 4L;
+        Long memberId = 1L;
         return likeService.increaseLikes(likeRequest, postId, memberId);
     }
 
     @DeleteMapping
     public Mono<Void> deleteLikes(@PathVariable("post-id") Long postId) {
-        Long memberId = 4L;
+        Long memberId = 1L;
         return likeService.decreaseLikes(postId,memberId);
     }
 }

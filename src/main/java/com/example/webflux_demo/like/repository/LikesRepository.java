@@ -1,8 +1,11 @@
 package com.example.webflux_demo.like.repository;
 
 import com.example.webflux_demo.like.entity.Likes;
+import lombok.Synchronized;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.relational.core.sql.LockMode;
+import org.springframework.data.relational.repository.Lock;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
@@ -17,22 +20,36 @@ public interface LikesRepository extends ReactiveCrudRepository<Likes, Long> {
 
     @Modifying
     @Query("""
-            update
-            mat_post p
-            set
-            p.likes = p.likes + 1
-            where p.id = :postId
+
+            insert into likes_count(likes, likes_post_id) values(likes + 1,:postId)
+            ON DUPLICATE KEY UPDATE likes = likes + 1
             """)
     Mono<Void> increasePostLikesCount(Long postId);
+
 
     @Modifying
     @Query("""
             update
-            mat_post p
+            likes_count lc
             set
-            p.likes = p.likes - 1
-            where p.id = :postId
+            lc.likes = lc.likes - 1
+            where lc.likes_post_id = :postId
             """)
     Mono<Void> decreasePostLikesCount(Long PostId);
+
+    @Modifying
+    @Query("""
+            update mat_post p
+            set
+            p.likes = :count
+            where p.id = :postId
+            """)
+    Mono<Void> updatePostLikes(Long postId,int count);
+    @Query("""
+            select likes
+            from likes_count lc
+            where lc.likes_post_id = :postId;
+            """)
+    Mono<Integer> getLikesCount(Long postId);
 }
 
